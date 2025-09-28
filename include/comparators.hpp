@@ -10,12 +10,8 @@ struct LessByAuthor {
     constexpr bool operator()(const bookdb::Book &a, const bookdb::Book &b) const noexcept {
         return (a.author < b.author) || (a.author == b.author && a.title < b.title);
     }
-    constexpr bool operator()(std::string_view a, const bookdb::Book &b) const noexcept {
-        return (a < b.author) || (a == b.author && std::string_view{} < std::string_view{});
-    }
-    constexpr bool operator()(const bookdb::Book &a, std::string_view b) const noexcept {
-        return (a.author < b) || (a.author == b && std::string_view{} < std::string_view{});
-    }
+    constexpr bool operator()(std::string_view a, const bookdb::Book &b) const noexcept { return a < b.author; }
+    constexpr bool operator()(const bookdb::Book &a, std::string_view b) const noexcept { return a.author < b; }
 };
 
 struct LessByPopularity {

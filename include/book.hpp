@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <format>
 #include <stdexcept>
 #include <string_view>
@@ -8,21 +9,20 @@ namespace bookdb {
 
 enum class Genre { Fiction, NonFiction, SciFi, Biography, Mystery, Unknown };
 
-// Ваш код для constexpr преобразования строк в enum::Genre и наоборот здесь
+inline constexpr auto GenreMap = std::to_array<std::pair<std::string_view, bookdb::Genre>>({
+    {"Fiction", bookdb::Genre::Fiction},
+    {"NonFiction", bookdb::Genre::NonFiction},
+    {"SciFi", bookdb::Genre::SciFi},
+    {"Biography", bookdb::Genre::Biography},
+    {"Mystery", bookdb::Genre::Mystery},
+    {"Unknown", bookdb::Genre::Unknown},
+});
 
 constexpr Genre GenreFromString(std::string_view s) {
-    if (s == std::string_view{"Fiction"})
-        return bookdb::Genre::Fiction;
-    if (s == std::string_view{"NonFiction"})
-        return bookdb::Genre::NonFiction;
-    if (s == std::string_view{"SciFi"})
-        return bookdb::Genre::SciFi;
-    if (s == std::string_view{"Biography"})
-        return bookdb::Genre::Biography;
-    if (s == std::string_view{"Mystery"})
-        return bookdb::Genre::Mystery;
-    if (s == std::string_view{"Unknown"})
-        return bookdb::Genre::Unknown;
+    for (const auto &kv : bookdb::GenreMap) {
+        if (kv.first == s)
+            return kv.second;
+    }
     return bookdb::Genre::Unknown;
 }
 
