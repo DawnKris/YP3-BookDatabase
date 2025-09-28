@@ -11,8 +11,19 @@ enum class Genre { Fiction, NonFiction, SciFi, Biography, Mystery, Unknown };
 // Ваш код для constexpr преобразования строк в enum::Genre и наоборот здесь
 
 constexpr Genre GenreFromString(std::string_view s) {
-    // Ваш код здесь
-    return Genre::Unknown;
+    if (s == std::string_view{"Fiction"})
+        return bookdb::Genre::Fiction;
+    if (s == std::string_view{"NonFiction"})
+        return bookdb::Genre::NonFiction;
+    if (s == std::string_view{"SciFi"})
+        return bookdb::Genre::SciFi;
+    if (s == std::string_view{"Biography"})
+        return bookdb::Genre::Biography;
+    if (s == std::string_view{"Mystery"})
+        return bookdb::Genre::Mystery;
+    if (s == std::string_view{"Unknown"})
+        return bookdb::Genre::Unknown;
+    return bookdb::Genre::Unknown;
 }
 
 struct Book {
@@ -25,7 +36,13 @@ struct Book {
     double rating;
     int read_count;
 
-    // Ваш код для конструкторов здесь
+    constexpr Book(std::string_view author_, std::string_view title_, int year_, bookdb::Genre genre_, double rating_,
+                   int read_count_ = 0)
+        : author(author_), title(title_), year(year_), genre(genre_), rating(rating_), read_count(read_count_) {}
+
+    constexpr Book(std::string_view author_, std::string_view title_, int year_, std::string_view genre_str,
+                   double rating_, int read_count_ = 0)
+        : Book(author_, title_, year_, GenreFromString(genre_str), rating_, read_count_) {}
 };
 }  // namespace bookdb
 
@@ -57,6 +74,16 @@ struct formatter<bookdb::Genre, char> {
     }
 };
 
-// Ваш код для std::formatter<Book> здесь
+template <>
+struct formatter<bookdb::Book, char> {
+    static constexpr const char *parse(std::format_parse_context &ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const bookdb::Book &b, FormatContext &fc) const {
+        return std::format_to(fc.out(),
+                              "{{ title: \"{}\", author: \"{}\", year: {}, genre: {}, rating: {:.2f}, reads: {} }}",
+                              b.title, b.author, b.year, b.genre, b.rating, b.read_count);
+    }
+};
 
 }  // namespace std
